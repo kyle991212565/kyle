@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>匿名大墩</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+        .app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            background: #111827;
+            transition: background-color 0.5s;
+        }
+        .app.light {
+            background: linear-gradient(to bottom right, #4f46e5, #7e22ce, #ec4899);
+        }
+        .theme-toggle {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            background-color: #facc15;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        .theme-toggle.light {
+            background-color: #4f46e5;
+        }
+        .theme-toggle .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #111827;
+        }
+        .theme-toggle.light .icon {
+            color: white;
+        }
+        .content {
+            width: 100%;
+            max-width: 28rem;
+        }
+        .welcome-text {
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4rem;
+            color: white;
+            opacity: 0;
+            transform: translateY(-50px);
+            transition: opacity 1s, transform 1s;
+        }
+        .welcome-text.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .button-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .button-wrapper:hover {
+            transform: translateY(-5px);
+        }
+        .button-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 1rem;
+            opacity: 0.75;
+            filter: blur(1rem);
+            transition: opacity 1s;
+        }
+        .button-wrapper:hover::before {
+            opacity: 1;
+        }
+        .gradient-blue::before {
+            background: linear-gradient(to right, #22d3ee, #0ea5e9);
+        }
+        .gradient-purple::before {
+            background: linear-gradient(to right, #c084fc, #e879f9);
+        }
+        .gradient-green::before {
+            background: linear-gradient(to right, #34d399, #10b981);
+        }
+        .button {
+            position: relative;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            background-color: #1f2937;
+            color: white;
+            border-radius: 1rem;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .button:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .button.light {
+            background-color: white;
+            color: #4f46e5;
+        }
+        .button-text {
+            display: flex;
+            align-items: center;
+        }
+        .button-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+        .button:hover .button-icon {
+            transform: rotate(15deg);
+        }
+        .chevron {
+            width: 1.75rem;
+            height: 1.75rem;
+            transition: transform 0.3s ease;
+        }
+        .button:hover .chevron {
+            transform: translateX(5px);
+        }
+        .button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .button:hover::after {
+            opacity: 0.2;
+        }
+        .gradient-blue .button::after {
+            background: linear-gradient(to right, #22d3ee, #0ea5e9);
+        }
+        .gradient-purple .button::after {
+            background: linear-gradient(to right, #c084fc, #e879f9);
+        }
+        .button.active::before {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.75; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="app">
+        <div class="content">
+            <button id="themeToggle" class="theme-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <h1 id="welcomeText" class="welcome-text">歡迎使用匿名大墩</h1>
+            <div class="button-wrapper gradient-blue">
+                <button class="button" onclick="window.location.href='https://sites.google.com/view/ddjh-anony'">
+                    <span class="button-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        官網
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="button-wrapper gradient-purple">
+                <button class="button" onclick="window.location.href='https://ddjh-anony.forteens.cc'">
+                    <span class="button-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        投稿連結
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="button-wrapper gradient-green">
+                <button class="button" onclick="window.location.href='https://forms.gle/m9yV8VSwDXP3buJf7'">
+                    <span class="button-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                        版務員徵選表單
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = document.getElementById('app');
+        const themeToggle = document.getElementById('themeToggle');
+        const welcomeText = document.getElementById('welcomeText');
+        const buttons = document.querySelectorAll('.button');
+        let lightMode = false;
+
+        function toggleLightMode() {
+            lightMode = !lightMode;
+            app.classList.toggle('light', lightMode);
+            themeToggle.classList.toggle('light', lightMode);
+            buttons.forEach(button => button.classList.toggle('light', lightMode));
+            themeToggle.innerHTML = lightMode 
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        }
+
+        themeToggle.addEventListener('click', toggleLightMode);
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                buttons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        setTimeout(() => {
+            welcomeText.classList.add('show');
+        }, 500);
+    </script>
+</body>
+</html>
