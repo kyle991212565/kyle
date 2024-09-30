@@ -10,6 +10,8 @@
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
+            width: 100%;
+            overflow-x: hidden;
         }
         .app {
             display: flex;
@@ -20,6 +22,8 @@
             padding: 1.5rem;
             background: #111827;
             transition: background-color 0.5s;
+            width: 100%;
+            box-sizing: border-box;
         }
         .app.light {
             background: linear-gradient(to bottom right, #4f46e5, #7e22ce, #ec4899);
@@ -30,6 +34,7 @@
             width: 100%;
             text-align: center;
             transition: background-color 0.5s, transform 0.3s;
+            box-sizing: border-box;
         }
         .header.light {
             background-color: #4f46e5;
@@ -40,16 +45,18 @@
         .header h2 {
             color: white;
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .header h2 svg {
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1.2rem;
+            height: 1.2rem;
             margin-right: 0.5rem;
+            flex-shrink: 0;
         }
         .theme-toggle {
             margin-bottom: 1rem;
