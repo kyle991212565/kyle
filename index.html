@@ -295,6 +295,39 @@
                 </div>
             </div>
 
+            <div id="grade9Subjects" class="hidden">
+                <div class="subject-row">
+                    <div class="subject-input">
+                        <label for="biology">生物:</label>
+                        <input type="number" id="biology" name="biology" min="0" max="100">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="biology_unpublished" name="biology_unpublished">
+                        <label for="biology_unpublished">未公布</label>
+                    </div>
+                </div>
+                <div class="subject-row">
+                    <div class="subject-input">
+                        <label for="physics_chemistry">理化:</label>
+                        <input type="number" id="physics_chemistry" name="physics_chemistry" min="0" max="100">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="physics_chemistry_unpublished" name="physics_chemistry_unpublished">
+                        <label for="physics_chemistry_unpublished">未公布</label>
+                    </div>
+                </div>
+                <div class="subject-row">
+                    <div class="subject-input">
+                        <label for="earth_science">地科:</label>
+                        <input type="number" id="earth_science" name="earth_science" min="0" max="100">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="earth_science_unpublished" name="earth_science_unpublished">
+                        <label for="earth_science_unpublished">未公布</label>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit">提交統計</button>
         </form>
         <div id="successMessage" class="success-message hidden">提交成功</div>
@@ -323,6 +356,7 @@
         const gradeSelect = document.getElementById('grade');
         const grade7Subjects = document.getElementById('grade7Subjects');
         const grade8Subjects = document.getElementById('grade8Subjects');
+        const grade9Subjects = document.getElementById('grade9Subjects');
         const successMessage = document.getElementById('successMessage');
 
         function toggleSubjects() {
@@ -331,12 +365,19 @@
             if (selectedGrade === '7') {
                 showElement(grade7Subjects);
                 hideElement(grade8Subjects);
+                hideElement(grade9Subjects);
             } else if (selectedGrade === '8') {
                 hideElement(grade7Subjects);
                 showElement(grade8Subjects);
+                hideElement(grade9Subjects);
+            } else if (selectedGrade === '9') {
+                hideElement(grade7Subjects);
+                hideElement(grade8Subjects);
+                showElement(grade9Subjects);
             } else {
                 hideElement(grade7Subjects);
                 hideElement(grade8Subjects);
+                hideElement(grade9Subjects);
             }
         }
 
