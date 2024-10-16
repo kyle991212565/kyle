@@ -81,7 +81,7 @@
             color: var(--primary-color);
         }
 
-        select, input[type="number"] {
+        select, input[type="number"], input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -90,7 +90,7 @@
             transition: all 0.3s ease;
         }
 
-        select:focus, input[type="number"]:focus {
+        select:focus, input[type="number"]:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
@@ -210,7 +210,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="chinese">國文:</label>
-                        <input type="number" id="chinese" name="chinese" min="0" max="100">
+                        <input type="text" id="chinese" name="chinese" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="chinese_unpublished" name="chinese_unpublished">
@@ -220,7 +220,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="math">數學:</label>
-                        <input type="number" id="math" name="math" min="0" max="100">
+                        <input type="text" id="math" name="math" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="math_unpublished" name="math_unpublished">
@@ -230,7 +230,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="civics">公民:</label>
-                        <input type="number" id="civics" name="civics" min="0" max="100">
+                        <input type="text" id="civics" name="civics" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="civics_unpublished" name="civics_unpublished">
@@ -240,7 +240,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="geography">地理:</label>
-                        <input type="number" id="geography" name="geography" min="0" max="100">
+                        <input type="text" id="geography" name="geography" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="geography_unpublished" name="geography_unpublished">
@@ -250,7 +250,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="history">歷史:</label>
-                        <input type="number" id="history" name="history" min="0" max="100">
+                        <input type="text" id="history" name="history" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="history_unpublished" name="history_unpublished">
@@ -260,7 +260,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="english">英文:</label>
-                        <input type="number" id="english" name="english" min="0" max="100">
+                        <input type="text" id="english" name="english" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="english_unpublished" name="english_unpublished">
@@ -273,7 +273,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="biology">生物:</label>
-                        <input type="number" id="biology" name="biology" min="0" max="100">
+                        <input type="text" id="biology" name="biology" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="biology_unpublished" name="biology_unpublished">
@@ -286,7 +286,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="physics_chemistry">理化:</label>
-                        <input type="number" id="physics_chemistry" name="physics_chemistry" min="0" max="100">
+                        <input type="text" id="physics_chemistry" name="physics_chemistry" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="physics_chemistry_unpublished" name="physics_chemistry_unpublished">
@@ -299,7 +299,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="biology">生物:</label>
-                        <input type="number" id="biology" name="biology" min="0" max="100">
+                        <input type="text" id="biology" name="biology" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="biology_unpublished" name="biology_unpublished">
@@ -309,7 +309,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="physics_chemistry">理化:</label>
-                        <input type="number" id="physics_chemistry" name="physics_chemistry" min="0" max="100">
+                        <input type="text" id="physics_chemistry" name="physics_chemistry" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="physics_chemistry_unpublished" name="physics_chemistry_unpublished">
@@ -319,7 +319,7 @@
                 <div class="subject-row">
                     <div class="subject-input">
                         <label for="earth_science">地科:</label>
-                        <input type="number" id="earth_science" name="earth_science" min="0" max="100">
+                        <input type="text" id="earth_science" name="earth_science" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="earth_science_unpublished" name="earth_science_unpublished">
@@ -333,11 +333,11 @@
         <div id="successMessage" class="success-message hidden">提交成功</div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-storage-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.ipify.org/ipify-api.js"></script>
     <script>
         const firebaseConfig = {
@@ -416,7 +416,7 @@
         });
 
         // 為每個成績輸入框添加事件監聽器
-        document.querySelectorAll('input[type="number"]').forEach(input => {
+        document.querySelectorAll('input[type="text"]').forEach(input => {
             const checkbox = document.getElementById(input.id + '_unpublished');
             input.addEventListener('input', () => {
                 if (input.value) {
@@ -462,6 +462,16 @@
                         }
                     }
                 }
+            });
+        });
+
+        // 修復手機瀏覽器點擊按鈕後沒反應的問題
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('active');
+            });
+            button.addEventListener('touchend', function() {
+                this.classList.remove('active');
             });
         });
     </script>
