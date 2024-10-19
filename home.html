@@ -105,6 +105,16 @@
             width: 100px;
             text-align: center;
         }
+        .pr-value {
+            background-color: #e67e22;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100px;
+            text-align: center;
+        }
         p {
             margin-bottom: 15px;
         }
@@ -112,6 +122,77 @@
             font-size: 24px;
             font-weight: bold;
             color: #e74c3c;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #scoreForm input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        #scoreForm button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+        }
+        #scoreForm button:hover {
+            opacity: 0.8;
+        }
+        .action-button {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 25px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .action-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }
     </style>
 </head>
@@ -160,37 +241,64 @@
                 <span class="subject-name">數學:</span>
                 <span id="mathScore" class="subject-score-value"></span>
                 <span id="mathRank" class="rank"></span>
+                <span id="mathPr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">公民:</span>
                 <span id="civicsScore" class="subject-score-value"></span>
                 <span id="civicsRank" class="rank"></span>
+                <span id="civicsPr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">國文:</span>
                 <span id="chineseScore" class="subject-score-value"></span>
                 <span id="chineseRank" class="rank"></span>
+                <span id="chinesePr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">歷史:</span>
                 <span id="historyScore" class="subject-score-value"></span>
                 <span id="historyRank" class="rank"></span>
+                <span id="historyPr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">英語:</span>
                 <span id="englishScore" class="subject-score-value"></span>
                 <span id="englishRank" class="rank"></span>
+                <span id="englishPr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">生物/理化:</span>
                 <span id="scienceScore" class="subject-score-value"></span>
                 <span id="scienceRank" class="rank"></span>
+                <span id="sciencePr" class="pr-value"></span>
             </div>
             <div class="subject-score">
                 <span class="subject-name">地理:</span>
                 <span id="geographyScore" class="subject-score-value"></span>
                 <span id="geographyRank" class="rank"></span>
+                <span id="geographyPr" class="pr-value"></span>
             </div>
+        </div>
+
+        <button id="actionButton" class="action-button">修改成績/我還沒填寫成績</button>
+    </div>
+
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>填寫成績</h2>
+            <form id="scoreForm">
+                <input type="number" id="grade" placeholder="年級" required>
+                <input type="number" id="math" placeholder="數學成績" required>
+                <input type="number" id="civics" placeholder="公民成績" required>
+                <input type="number" id="chinese" placeholder="國文成績" required>
+                <input type="number" id="history" placeholder="歷史成績" required>
+                <input type="number" id="english" placeholder="英語成績" required>
+                <input type="number" id="science" placeholder="生物/理化成績" required>
+                <input type="number" id="geography" placeholder="地理成績" required>
+                <button type="submit">提交成績</button>
+            </form>
         </div>
     </div>
 
@@ -212,6 +320,11 @@
         function calculateAverage(sum, count) {
             if (count === 0) return "0.00";
             return (sum / count).toFixed(2);
+        }
+
+        // 計算 PR 值的函數
+        function calculatePr(rank, total) {
+            return ((total - rank) / total * 100).toFixed(2);
         }
 
         // 定義可能的 grade 值
@@ -349,13 +462,15 @@
                         const score = Number(personalData[subject]);
                         if (!isNaN(score) && score > 1 && personalData[subject] !== "未公布") {
                             totalScore += score;
-                            let scoreElement, rankElement;
+                            let scoreElement, rankElement, prElement;
                             if (subject === 'biology' || subject === 'physics_chemistry') {
                                 scoreElement = document.getElementById('scienceScore');
                                 rankElement = document.getElementById('scienceRank');
+                                prElement = document.getElementById('sciencePr');
                             } else {
                                 scoreElement = document.getElementById(`${subject}Score`);
                                 rankElement = document.getElementById(`${subject}Rank`);
+                                prElement = document.getElementById(`${subject}Pr`);
                             }
                             if (scoreElement) {
                                 scoreElement.textContent = score.toFixed(2);
@@ -364,14 +479,19 @@
                             if (rankElement) {
                                 rankElement.textContent = `第 ${rank} 名`;
                             }
+                            if (prElement) {
+                                prElement.textContent = `PR: ${calculatePr(rank, allScores[grade][subject].length)}`;
+                            }
                         } else {
-                            let scoreElement, rankElement;
+                            let scoreElement, rankElement, prElement;
                             if (subject === 'biology' || subject === 'physics_chemistry') {
                                 scoreElement = document.getElementById('scienceScore');
                                 rankElement = document.getElementById('scienceRank');
+                                prElement = document.getElementById('sciencePr');
                             } else {
                                 scoreElement = document.getElementById(`${subject}Score`);
                                 rankElement = document.getElementById(`${subject}Rank`);
+                                prElement = document.getElementById(`${subject}Pr`);
                             }
                             if (scoreElement) {
                                 scoreElement.textContent = '無效分數';
@@ -379,13 +499,18 @@
                             if (rankElement) {
                                 rankElement.textContent = '無效分數';
                             }
+                            if (prElement) {
+                                prElement.textContent = '無效分數';
+                            }
                         }
                     }
 
                     // 更新總分
                     document.getElementById('totalScore').textContent = totalScore.toFixed(2);
+                    document.getElementById('actionButton').textContent = '修改成績';
                 } else {
                     console.log('未找到個人數據');
+                    document.getElementById('actionButton').textContent = '我還沒填寫成績';
                 }
             });
         }
@@ -394,6 +519,13 @@
         getIp().then(ip => {
             calculatePersonalScore(ip);
         });
+
+        // 模擬框相關代碼
+        var btn = document.getElementById("actionButton");
+
+        btn.onclick = function() {
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 </html>
