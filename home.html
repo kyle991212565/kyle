@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7年級、8年級和9年級學生成績分析</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .grade-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .grade-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+        li:hover {
+            background-color: #f7f9fc;
+        }
+        .average {
+            font-weight: bold;
+            color: #2980b9;
+            font-size: 18px;
+        }
+        #personalScore {
+            background-color: #e9ecef;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #ced4da;
+        }
+        .subject-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .subject-score:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        .subject-name {
+            font-weight: bold;
+            color: #34495e;
+            font-size: 16px;
+            width: 120px;
+        }
+        .subject-score-value {
+            width: 80px;
+            text-align: right;
+        }
+        .rank {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100px;
+            text-align: center;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        #totalScore {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="grade7" class="grade-section">
+            <h2>7年級</h2>
+            <ul id="grade7List"></ul>
+            <p>數學平均分數: <span id="avg7" class="average"></span> (有效樣本數: <span id="validCount7Math"></span>)</p>
+            <p>公民平均分數: <span id="civicsAvg7" class="average"></span> (有效樣本數: <span id="validCount7Civics"></span>)</p>
+            <p>國文平均分數: <span id="chineseAvg7" class="average"></span> (有效樣本數: <span id="validCount7Chinese"></span>)</p>
+            <p>歷史平均分數: <span id="historyAvg7" class="average"></span> (有效樣本數: <span id="validCount7History"></span>)</p>
+            <p>英語平均分數: <span id="englishAvg7" class="average"></span> (有效樣本數: <span id="validCount7English"></span>)</p>
+            <p>生物平均分數: <span id="biologyAvg7" class="average"></span> (有效樣本數: <span id="validCount7Biology"></span>)</p>
+            <p>地理平均分數: <span id="geographyAvg7" class="average"></span> (有效樣本數: <span id="validCount7Geography"></span>)</p>
+        </div>
+
+        <div id="grade8" class="grade-section">
+            <h2>8年級</h2>
+            <ul id="grade8List"></ul>
+            <p>數學平均分數: <span id="avg8" class="average"></span> (有效樣本數: <span id="validCount8Math"></span>)</p>
+            <p>公民平均分數: <span id="civicsAvg8" class="average"></span> (有效樣本數: <span id="validCount8Civics"></span>)</p>
+            <p>國文平均分數: <span id="chineseAvg8" class="average"></span> (有效樣本數: <span id="validCount8Chinese"></span>)</p>
+            <p>歷史平均分數: <span id="historyAvg8" class="average"></span> (有效樣本數: <span id="validCount8History"></span>)</p>
+            <p>英語平均分數: <span id="englishAvg8" class="average"></span> (有效樣本數: <span id="validCount8English"></span>)</p>
+            <p>理化平均分數: <span id="physics_chemistryAvg8" class="average"></span> (有效樣本數: <span id="validCount8Physics_Chemistry"></span>)</p>
+            <p>地理平均分數: <span id="geographyAvg8" class="average"></span> (有效樣本數: <span id="validCount8Geography"></span>)</p>
+        </div>
+
+        <div id="grade9" class="grade-section">
+            <h2>9年級</h2>
+            <ul id="grade9List"></ul>
+            <p>數學平均分數: <span id="avg9" class="average"></span> (有效樣本數: <span id="validCount9Math"></span>)</p>
+            <p>公民平均分數: <span id="civicsAvg9" class="average"></span> (有效樣本數: <span id="validCount9Civics"></span>)</p>
+            <p>國文平均分數: <span id="chineseAvg9" class="average"></span> (有效樣本數: <span id="validCount9Chinese"></span>)</p>
+            <p>歷史平均分數: <span id="historyAvg9" class="average"></span> (有效樣本數: <span id="validCount9History"></span>)</p>
+            <p>英語平均分數: <span id="englishAvg9" class="average"></span> (有效樣本數: <span id="validCount9English"></span>)</p>
+            <p>理化平均分數: <span id="physics_chemistryAvg9" class="average"></span> (有效樣本數: <span id="validCount9Physics_Chemistry"></span>)</p>
+            <p>地理平均分數: <span id="geographyAvg9" class="average"></span> (有效樣本數: <span id="validCount9Geography"></span>)</p>
+        </div>
+
+        <div id="personalScore">
+            <h2>個人成績</h2>
+            <p>總成績: <span id="totalScore"></span></p>
+            <div class="subject-score">
+                <span class="subject-name">數學:</span>
+                <span id="mathScore" class="subject-score-value"></span>
+                <span id="mathRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">公民:</span>
+                <span id="civicsScore" class="subject-score-value"></span>
+                <span id="civicsRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">國文:</span>
+                <span id="chineseScore" class="subject-score-value"></span>
+                <span id="chineseRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">歷史:</span>
+                <span id="historyScore" class="subject-score-value"></span>
+                <span id="historyRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">英語:</span>
+                <span id="englishScore" class="subject-score-value"></span>
+                <span id="englishRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">生物/理化:</span>
+                <span id="scienceScore" class="subject-score-value"></span>
+                <span id="scienceRank" class="rank"></span>
+            </div>
+            <div class="subject-score">
+                <span class="subject-name">地理:</span>
+                <span id="geographyScore" class="subject-score-value"></span>
+                <span id="geographyRank" class="rank"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAw3LKSDHHwasOhN0l63lO4I-AO1xeGGU",
+            authDomain: "tmjh113.firebaseapp.com",
+            projectId: "tmjh113",
+            storageBucket: "tmjh113.appspot.com",
+            messagingSenderId: "936878916477",
+            appId: "1:936878916477:web:cbff479db9898b0a218214",
+            measurementId: "G-J5WT01ZLBD"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 計算平均分數的函數
+        function calculateAverage(sum, count) {
+            if (count === 0) return "0.00";
+            return (sum / count).toFixed(2);
+        }
+
+        // 定義可能的 grade 值
+        const gradeValues7 = [7, "7", "7 "];
+        const gradeValues8 = [8, "8", "8 "];
+        const gradeValues9 = [9, "9", "9 "];
+
+        // 獲取並顯示數據
+        function fetchData(gradeValues, gradeId, avgId, listId, subject, validCountId) {
+            db.collection("grades")
+                .where("grade", "in", gradeValues)
+                .get()
+                .then((querySnapshot) => {
+                    let sum = 0;
+                    let validCount = 0;
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        console.log("文件ID:", doc.id, "數據:", data);
+
+                        // 處理 grade 字段，去除空格並轉換為數字
+                        let grade = data.grade;
+                        if (typeof grade === 'string') {
+                            grade = grade.trim();
+                            grade = Number(grade);
+                        }
+
+                        // 確認 grade 是目標年級
+                        if (gradeValues.includes(grade)) {
+                            const score = Number(data[subject]);
+                            
+                            console.log(`學生: ${data.name}, ${subject}分數: ${data[subject]}, 轉換後: ${score}`);
+
+                            // 檢查分數是否有效
+                            if (!isNaN(score) && score > 1 && data[subject] !== "未公布") {
+                                sum += score;
+                                validCount++;
+                                console.log(`有效分數: ${score}, 當前總和: ${sum}, 有效計數: ${validCount}`);
+                            } else {
+                                console.log(`無效分數: ${data[subject]}`);
+                            }
+                        }
+                    });
+
+                    console.log(`最終總和: ${sum}, 最終有效計數: ${validCount}`);
+
+                    // 更新 DOM
+                    document.getElementById(avgId).textContent = calculateAverage(sum, validCount);
+                    document.getElementById(validCountId).textContent = validCount;
+                })
+                .catch((error) => {
+                    console.error("獲取文件時出錯: ", error);
+                });
+        }
+
+        fetchData(gradeValues7, "grade7", "avg7", "grade7List", "math", "validCount7Math");
+        fetchData(gradeValues8, "grade8", "avg8", "grade8List", "math", "validCount8Math");
+        fetchData(gradeValues9, "grade9", "avg9", "grade9List", "math", "validCount9Math");
+
+        fetchData(gradeValues7, "grade7", "civicsAvg7", "grade7List", "civics", "validCount7Civics");
+        fetchData(gradeValues8, "grade8", "civicsAvg8", "grade8List", "civics", "validCount8Civics");
+        fetchData(gradeValues9, "grade9", "civicsAvg9", "grade9List", "civics", "validCount9Civics");
+
+        fetchData(gradeValues7, "grade7", "chineseAvg7", "grade7List", "chinese", "validCount7Chinese");
+        fetchData(gradeValues8, "grade8", "chineseAvg8", "grade8List", "chinese", "validCount8Chinese");
+        fetchData(gradeValues9, "grade9", "chineseAvg9", "grade9List", "chinese", "validCount9Chinese");
+
+        fetchData(gradeValues7, "grade7", "historyAvg7", "grade7List", "history", "validCount7History");
+        fetchData(gradeValues8, "grade8", "historyAvg8", "grade8List", "history", "validCount8History");
+        fetchData(gradeValues9, "grade9", "historyAvg9", "grade9List", "history", "validCount9History");
+
+        fetchData(gradeValues7, "grade7", "englishAvg7", "grade7List", "english", "validCount7English");
+        fetchData(gradeValues8, "grade8", "englishAvg8", "grade8List", "english", "validCount8English");
+        fetchData(gradeValues9, "grade9", "englishAvg9", "grade9List", "english", "validCount9English");
+
+        fetchData(gradeValues7, "grade7", "biologyAvg7", "grade7List", "biology", "validCount7Biology");
+        fetchData(gradeValues8, "grade8", "physics_chemistryAvg8", "grade8List", "physics_chemistry", "validCount8Physics_Chemistry");
+        fetchData(gradeValues9, "grade9", "physics_chemistryAvg9", "grade9List", "physics_chemistry", "validCount9Physics_Chemistry");
+
+        fetchData(gradeValues7, "grade7", "geographyAvg7", "grade7List", "geography", "validCount7Geography");
+        fetchData(gradeValues8, "grade8", "geographyAvg8", "grade8List", "geography", "validCount8Geography");
+        fetchData(gradeValues9, "grade9", "geographyAvg9", "grade9List", "geography", "validCount9Geography");
+
+        // 獲取IP地址
+        function getIp() {
+            return fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => data.ip);
+        }
+
+        // 計算個人成績和排名
+        function calculatePersonalScore(ip) {
+            db.collection('grades').get().then((querySnapshot) => {
+                let personalData;
+                let allScores = {
+                    7: {math: [], civics: [], chinese: [], history: [], english: [], biology: [], geography: []},
+                    8: {math: [], civics: [], chinese: [], history: [], english: [], physics_chemistry: [], geography: []},
+                    9: {math: [], civics: [], chinese: [], history: [], english: [], physics_chemistry: [], geography: []}
+                };
+                let totalScore = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (doc.id === ip) {
+                        personalData = data;
+                    }
+
+                    // 處理 grade 字段
+                    let grade = data.grade;
+                    if (typeof grade === 'string') {
+                        grade = grade.trim();
+                        grade = Number(grade);
+                    }
+
+                    // 收集所有有效分數
+                    if (grade in allScores) {
+                        for (let subject in allScores[grade]) {
+                            const score = Number(data[subject]);
+                            if (!isNaN(score) && score > 1 && data[subject] !== "未公布") {
+                                allScores[grade][subject].push(score);
+                            }
+                        }
+                    }
+                });
+
+                if (personalData) {
+                    let grade = personalData.grade;
+                    if (typeof grade === 'string') {
+                        grade = grade.trim();
+                        grade = Number(grade);
+                    }
+
+                    // 計算總分並顯示各科成績
+                    for (let subject in allScores[grade]) {
+                        const score = Number(personalData[subject]);
+                        if (!isNaN(score) && score > 1 && personalData[subject] !== "未公布") {
+                            totalScore += score;
+                            let scoreElement, rankElement;
+                            if (subject === 'biology' || subject === 'physics_chemistry') {
+                                scoreElement = document.getElementById('scienceScore');
+                                rankElement = document.getElementById('scienceRank');
+                            } else {
+                                scoreElement = document.getElementById(`${subject}Score`);
+                                rankElement = document.getElementById(`${subject}Rank`);
+                            }
+                            if (scoreElement) {
+                                scoreElement.textContent = score.toFixed(2);
+                            }
+                            const rank = allScores[grade][subject].filter(s => s > score).length + 1;
+                            if (rankElement) {
+                                rankElement.textContent = `第 ${rank} 名`;
+                            }
+                        } else {
+                            let scoreElement, rankElement;
+                            if (subject === 'biology' || subject === 'physics_chemistry') {
+                                scoreElement = document.getElementById('scienceScore');
+                                rankElement = document.getElementById('scienceRank');
+                            } else {
+                                scoreElement = document.getElementById(`${subject}Score`);
+                                rankElement = document.getElementById(`${subject}Rank`);
+                            }
+                            if (scoreElement) {
+                                scoreElement.textContent = '無效分數';
+                            }
+                            if (rankElement) {
+                                rankElement.textContent = '無效分數';
+                            }
+                        }
+                    }
+
+                    // 更新總分
+                    document.getElementById('totalScore').textContent = totalScore.toFixed(2);
+                } else {
+                    console.log('未找到個人數據');
+                }
+            });
+        }
+
+        // 獲取IP並計算個人成績
+        getIp().then(ip => {
+            calculatePersonalScore(ip);
+        });
+    </script>
+</body>
+</html>

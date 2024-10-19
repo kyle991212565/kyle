@@ -298,22 +298,22 @@
             <div id="grade9Subjects" class="hidden">
                 <div class="subject-row">
                     <div class="subject-input">
-                        <label for="biology">生物:</label>
-                        <input type="text" id="biology" name="biology" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
+                        <label for="biology9">生物:</label>
+                        <input type="text" id="biology9" name="biology9" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
-                        <input type="checkbox" id="biology_unpublished" name="biology_unpublished">
-                        <label for="biology_unpublished">未公布</label>
+                        <input type="checkbox" id="biology9_unpublished" name="biology9_unpublished">
+                        <label for="biology9_unpublished">未公布</label>
                     </div>
                 </div>
                 <div class="subject-row">
                     <div class="subject-input">
-                        <label for="physics_chemistry">理化:</label>
-                        <input type="text" id="physics_chemistry" name="physics_chemistry" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
+                        <label for="physics_chemistry9">理化:</label>
+                        <input type="text" id="physics_chemistry9" name="physics_chemistry9" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
                     </div>
                     <div class="checkbox-group">
-                        <input type="checkbox" id="physics_chemistry_unpublished" name="physics_chemistry_unpublished">
-                        <label for="physics_chemistry_unpublished">未公布</label>
+                        <input type="checkbox" id="physics_chemistry9_unpublished" name="physics_chemistry9_unpublished">
+                        <label for="physics_chemistry9_unpublished">未公布</label>
                     </div>
                 </div>
                 <div class="subject-row">
@@ -398,19 +398,28 @@
             const formData = new FormData(this);
             let output = '統計結果：\n\n';
             const data = {};
+            let allFieldsFilled = true;
             for (let [key, value] of formData.entries()) {
                 if (key.endsWith('_unpublished')) {
                     const subjectName = key.replace('_unpublished', '');
                     output += `${subjectName}: ${value === 'on' ? '未公布' : formData.get(subjectName) || '未填寫'}\n`;
                     data[subjectName] = value === 'on' ? '未公布' : formData.get(subjectName) || '未填寫';
-                } else {
+                    if (value !== 'on' && (!formData.get(subjectName) || formData.get(subjectName) === '0')) {
+                        allFieldsFilled = false;
+                    }
+                } else if (key !== 'grade') {
                     data[key] = value;
                 }
             }
+            data.grade = gradeSelect.value;
             getIp().then(ip => {
                 data.ip = ip;
                 db.collection('grades').doc(ip).set(data).then(() => {
-                    showElement(successMessage);
+                    if (allFieldsFilled) {
+                        window.location.href = 'home.html';
+                    } else {
+                        showElement(successMessage);
+                    }
                 });
             });
         });
@@ -448,8 +457,11 @@
             db.collection('grades').doc(ip).get().then(doc => {
                 if (doc.exists) {
                     const data = doc.data();
+                    const selectedGrade = data.grade;
+                    gradeSelect.value = selectedGrade;
+                    toggleSubjects();
                     for (let key in data) {
-                        if (key !== 'ip') {
+                        if (key !== 'ip' && key !== 'grade') {
                             const input = document.getElementById(key);
                             const checkbox = document.getElementById(key + '_unpublished');
                             if (input) {
