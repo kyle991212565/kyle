@@ -3,342 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>匿名統計成績</title>
+    <title>5v5 比賽倒計時</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --primary-color: #8a2be2;
-            --secondary-color: #ff69b4;
-            --background-color: #f8f9fa;
-            --text-color: #333;
-            --input-background: #fff;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --hover-color: #9370db;
-            --success-color: #28a745;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes shine {
+            0% { background-position: -100% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255,215,0,0.2); }
+            50% { box-shadow: 0 0 20px rgba(255,215,0,0.6); }
+            100% { box-shadow: 0 0 5px rgba(255,215,0,0.2); }
+        }
+
+        @keyframes borderGlow {
+            0% { border-color: rgba(255,255,255,0.3); }
+            50% { border-color: rgba(255,255,255,0.8); }
+            100% { border-color: rgba(255,255,255,0.3); }
         }
 
         body {
-            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
             min-height: 100vh;
-            background-image: 
-                linear-gradient(45deg, rgba(138, 43, 226, 0.1) 0%, rgba(255, 105, 180, 0.1) 100%);
+            background: linear-gradient(-45deg, #0f0f1e, #1a1a3a, #1e1e2e, #2a2a4a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
         }
-
+        
         .container {
-            background-color: var(--input-background);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow-color);
-            padding: 40px;
-            width: 100%;
-            max-width: 700px;
-            transition: all 0.3s ease;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        h1 {
+        .title {
             text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
+            font-size: 3.5em;
+            margin: 20px 0;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5),
+                         0 0 20px rgba(255,255,255,0.3),
+                         0 0 30px rgba(255,255,255,0.2);
+            letter-spacing: 5px;
+            position: relative;
+        }
+
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+        }
+        
+        .countdown {
+            text-align: center;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 30px;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.18);
+            animation: glow 2s infinite, borderGlow 2s infinite;
         }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .subject-row {
+        
+        .teams {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.7);
+            margin-top: 40px;
+            gap: 40px;
+            perspective: 1000px;
+        }
+        
+        .team {
+            flex: 1;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .subject-row:hover {
-            background-color: rgba(138, 43, 226, 0.05);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.1);
-        }
-
-        .subject-input {
-            flex-grow: 1;
-            margin-right: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        select, input[type="number"], input[type="text"] {
+        .team::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .team:hover::before {
+            left: 100%;
+        }
+
+        .team:hover {
+            transform: translateY(-10px) rotateX(5deg);
+        }
+        
+        .team-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .team-blue .team-title {
+            color: #4a9eff;
+            text-shadow: 0 0 10px rgba(74, 158, 255, 0.5),
+                         0 0 20px rgba(74, 158, 255, 0.3);
+        }
+
+        .team-red .team-title {
+            color: #ff4a4a;
+            text-shadow: 0 0 10px rgba(255, 74, 74, 0.5),
+                         0 0 20px rgba(255, 74, 74, 0.3);
+        }
+
+        .team-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: currentColor;
+            border-radius: 2px;
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        .player {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
             transition: all 0.3s ease;
-        }
-
-        select:focus, input[type="number"]:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
-        }
-
-        .checkbox-group {
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
-            white-space: nowrap;
-            margin-left: 20px;
+            justify-content: center;
+            flex-direction: column;
         }
 
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 8px;
-            transform: scale(1.2);
+        .player::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: skewX(-45deg);
+            top: 0;
+            left: -200%;
+            transition: 0.5s;
         }
 
-        .checkbox-group label {
-            color: var(--text-color);
-            font-weight: normal;
+        .player:hover::before {
+            left: 200%;
+        }
+        
+        .player:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        button {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 18px;
-            width: 100%;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 20px;
+        .team-blue .player {
+            border-left: 4px solid #4a9eff;
+            color: #bfe6ff;
         }
 
-        button:hover {
-            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.3);
+        .team-red .player {
+            border-left: 4px solid #ff4a4a;
+            color: #ffbfbf;
         }
-
-        .hidden {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .visible {
-            display: block;
-            opacity: 1;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fadeIn {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        #grade {
-            background-color: #f9f9f9;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .success-message {
-            color: var(--success-color);
+        
+        .vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5em;
             font-weight: bold;
-            text-align: center;
-            margin-top: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5),
+                         0 0 20px rgba(255, 215, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+            padding: 20px;
         }
 
-        @media (max-width: 600px) {
-            .container {
+        .vs::before, .vs::after {
+            content: '⚔️';
+            position: absolute;
+            font-size: 0.5em;
+        }
+
+        .vs::before {
+            top: -20px;
+            transform: rotate(-45deg);
+        }
+
+        .vs::after {
+            bottom: -20px;
+            transform: rotate(45deg);
+        }
+
+        .countdown-section {
+            display: inline-block;
+            margin: 0 15px;
+            min-width: 120px;
+            position: relative;
+        }
+
+        .countdown-section::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .countdown-section:last-child::after {
+            display: none;
+        }
+
+        .countdown-amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .countdown-period {
+            font-size: 0.6em;
+            text-transform: uppercase;
+            color: #fff;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .match-info {
+            text-align: center;
+            margin: 30px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 1.4em;
+            color: #ffd700;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .match-info i {
+            margin-right: 10px;
+            animation: float 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .player-number {
+            position: absolute;
+            left: 15px;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .player-info {
+            margin-top: 10px;
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .teams {
+                flex-direction: column;
+            }
+            .vs {
+                margin: 20px 0;
+                font-size: 2.5em;
+            }
+            .countdown {
+                font-size: 1.8em;
+                padding: 15px;
+            }
+            .team {
                 padding: 20px;
             }
-
-            .subject-row {
-                flex-direction: column;
-                align-items: flex-start;
+            .title {
+                font-size: 2.5em;
             }
-
-            .subject-input {
-                margin-right: 0;
-                margin-bottom: 10px;
-                width: 100%;
-            }
-
-            .checkbox-group {
-                width: 100%;
-                justify-content: flex-start;
-                margin-left: 0;
-                margin-top: 10px;
+            .countdown-section {
+                min-width: 80px;
+                margin: 0 10px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>匿名統計成績</h1>
-        <form id="gradeForm">
-            <div class="form-group">
-                <label for="grade">選擇年級:</label>
-                <select id="grade" name="grade">
-                    <option value="7">7年級</option>
-                    <option value="8">8年級</option>
-                    <option value="9">9年級</option>
-                </select>
-            </div>
+        <h1 class="title">5V5 競技賽</h1>
+        
+        <div class="match-info">
+            <i class="fas fa-trophy"></i> 比賽時間：明天 20:00
+        </div>
 
-            <div id="commonSubjects">
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="chinese">國文:</label>
-                        <input type="text" id="chinese" name="chinese" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="chinese_unpublished" name="chinese_unpublished">
-                        <label for="chinese_unpublished">未公布</label>
-                    </div>
+        <div class="countdown" id="countdown">
+            倒計時載入中...
+        </div>
+        
+        <div class="teams">
+            <div class="team team-blue">
+                <div class="team-title">
+                    <i class="fas fa-shield-alt"></i> 藍隊
                 </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="math">數學:</label>
-                        <input type="text" id="math" name="math" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="math_unpublished" name="math_unpublished">
-                        <label for="math_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="civics">公民:</label>
-                        <input type="text" id="civics" name="civics" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="civics_unpublished" name="civics_unpublished">
-                        <label for="civics_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="geography">地理:</label>
-                        <input type="text" id="geography" name="geography" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="geography_unpublished" name="geography_unpublished">
-                        <label for="geography_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="history">歷史:</label>
-                        <input type="text" id="history" name="history" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="history_unpublished" name="history_unpublished">
-                        <label for="history_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="english">英文:</label>
-                        <input type="text" id="english" name="english" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="english_unpublished" name="english_unpublished">
-                        <label for="english_unpublished">未公布</label>
-                    </div>
-                </div>
+                <div class="player" id="Ojg4T"><span class="player-number">#1</span>Ojg4T</div>
+                <div class="player" id="Ex7sq"><span class="player-number">#2</span>Ex7sq</div>
+                <div class="player" id="Yib9s"><span class="player-number">#3</span>Yib9s</div>
+                <div class="player" id="QWvmW"><span class="player-number">#4</span>QWvmW</div>
+                <div class="player" id="PRlj8"><span class="player-number">#5</span>PRlj8</div>
             </div>
-
-            <div id="grade7Subjects" class="hidden">
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="biology">生物:</label>
-                        <input type="text" id="biology" name="biology" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="biology_unpublished" name="biology_unpublished">
-                        <label for="biology_unpublished">未公布</label>
-                    </div>
+            
+            <div class="vs">VS</div>
+            
+            <div class="team team-red">
+                <div class="team-title">
+                    <i class="fas fa-fire"></i> 紅隊
                 </div>
+                <div class="player" id="Kpd6Q"><span class="player-number">#1</span>Kpd6Q</div>
+                <div class="player" id="sug8Q"><span class="player-number">#2</span>sug8Q</div>
+                <div class="player" id="7Mvne"><span class="player-number">#3</span>7Mvne</div>
+                <div class="player" id="mZeoJ"><span class="player-number">#4</span>mZeoJ</div>
+                <div class="player" id="zjr1t"><span class="player-number">#5</span>zjr1t</div>
             </div>
-
-            <div id="grade8Subjects" class="hidden">
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="physics_chemistry">理化:</label>
-                        <input type="text" id="physics_chemistry" name="physics_chemistry" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="physics_chemistry_unpublished" name="physics_chemistry_unpublished">
-                        <label for="physics_chemistry_unpublished">未公布</label>
-                    </div>
-                </div>
-            </div>
-
-            <div id="grade9Subjects" class="hidden">
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="biology9">生物:</label>
-                        <input type="text" id="biology9" name="biology9" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="biology9_unpublished" name="biology9_unpublished">
-                        <label for="biology9_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="physics_chemistry9">理化:</label>
-                        <input type="text" id="physics_chemistry9" name="physics_chemistry9" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="physics_chemistry9_unpublished" name="physics_chemistry9_unpublished">
-                        <label for="physics_chemistry9_unpublished">未公布</label>
-                    </div>
-                </div>
-                <div class="subject-row">
-                    <div class="subject-input">
-                        <label for="earth_science">地科:</label>
-                        <input type="text" id="earth_science" name="earth_science" pattern="\d+(\.\d{1,2})?" title="請輸入有效的數字，最多兩位小數" min="0" max="100">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="earth_science_unpublished" name="earth_science_unpublished">
-                        <label for="earth_science_unpublished">未公布</label>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit">提交統計</button>
-        </form>
-        <div id="successMessage" class="success-message hidden">提交成功</div>
+        </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.ipify.org/ipify-api.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDAw3LKSDHHwasOhN0l63lO4I-AO1xeGGU",
@@ -349,143 +399,73 @@
             appId: "1:936878916477:web:cbff479db9898b0a218214",
             measurementId: "G-J5WT01ZLBD"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const gradeSelect = document.getElementById('grade');
-        const grade7Subjects = document.getElementById('grade7Subjects');
-        const grade8Subjects = document.getElementById('grade8Subjects');
-        const grade9Subjects = document.getElementById('grade9Subjects');
-        const successMessage = document.getElementById('successMessage');
-
-        function toggleSubjects() {
-            const selectedGrade = gradeSelect.value;
+        async function loadPlayerInfo() {
+            const players = document.querySelectorAll('.player');
             
-            if (selectedGrade === '7') {
-                showElement(grade7Subjects);
-                hideElement(grade8Subjects);
-                hideElement(grade9Subjects);
-            } else if (selectedGrade === '8') {
-                hideElement(grade7Subjects);
-                showElement(grade8Subjects);
-                hideElement(grade9Subjects);
-            } else if (selectedGrade === '9') {
-                hideElement(grade7Subjects);
-                hideElement(grade8Subjects);
-                showElement(grade9Subjects);
-            } else {
-                hideElement(grade7Subjects);
-                hideElement(grade8Subjects);
-                hideElement(grade9Subjects);
+            for(let player of players) {
+                const code = player.id;
+                try {
+                    const querySnapshot = await db.collection('registrations')
+                        .where('code', '==', code)
+                        .get();
+                    
+                    if (!querySnapshot.empty) {
+                        const userData = querySnapshot.docs[0].data();
+                        const playerInfo = document.createElement('div');
+                        playerInfo.className = 'player-info';
+                        playerInfo.innerHTML = `
+                            ${userData.name}<br>
+                            ${userData.username || ''}
+                        `;
+                        player.appendChild(playerInfo);
+                    }
+                } catch (error) {
+                    console.error('讀取玩家資料時發生錯誤：', error);
+                }
             }
         }
 
-        function showElement(element) {
-            element.classList.remove('hidden');
-            element.classList.add('visible', 'fadeIn');
-        }
-
-        function hideElement(element) {
-            element.classList.remove('visible', 'fadeIn');
-            element.classList.add('hidden');
-        }
-
-        gradeSelect.addEventListener('change', toggleSubjects);
-
-        document.getElementById('gradeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            let output = '統計結果：\n\n';
-            const data = {};
-            let allFieldsFilled = true;
-            for (let [key, value] of formData.entries()) {
-                if (key.endsWith('_unpublished')) {
-                    const subjectName = key.replace('_unpublished', '');
-                    output += `${subjectName}: ${value === 'on' ? '未公布' : formData.get(subjectName) || '未填寫'}\n`;
-                    data[subjectName] = value === 'on' ? '未公布' : formData.get(subjectName) || '未填寫';
-                    if (value !== 'on' && (!formData.get(subjectName) || formData.get(subjectName) === '0')) {
-                        allFieldsFilled = false;
-                    }
-                } else if (key !== 'grade') {
-                    data[key] = value;
-                }
+        function updateCountdown() {
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + 1);
+            targetDate.setHours(20, 0, 0, 0);
+            
+            const now = new Date();
+            const difference = targetDate - now;
+            
+            const hours = Math.floor(difference / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            const countdownHTML = `
+                <div class="countdown-section">
+                    <div class="countdown-amount">${hours}</div>
+                    <div class="countdown-period">小時</div>
+                </div>
+                <div class="countdown-section">
+                    <div class="countdown-amount">${minutes}</div>
+                    <div class="countdown-period">分鐘</div>
+                </div>
+                <div class="countdown-section">
+                    <div class="countdown-amount">${seconds}</div>
+                    <div class="countdown-period">秒</div>
+                </div>
+            `;
+            
+            if (difference < 0) {
+                document.getElementById('countdown').innerHTML = '<div class="countdown-amount">比賽已開始！🏆</div>';
+                return;
             }
-            data.grade = gradeSelect.value;
-            getIp().then(ip => {
-                data.ip = ip;
-                db.collection('grades').doc(ip).set(data).then(() => {
-                    if (allFieldsFilled) {
-                        window.location.href = 'home.html';
-                    } else {
-                        showElement(successMessage);
-                    }
-                });
-            });
-        });
-
-        // 為每個成績輸入框添加事件監聽器
-        document.querySelectorAll('input[type="text"]').forEach(input => {
-            const checkbox = document.getElementById(input.id + '_unpublished');
-            input.addEventListener('input', () => {
-                if (input.value) {
-                    checkbox.checked = false;
-                }
-            });
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    input.value = '';
-                    input.disabled = true;
-                } else {
-                    input.disabled = false;
-                }
-            });
-        });
-
-        // 初始化頁面
-        toggleSubjects();
-
-        // 獲取IP地址
-        function getIp() {
-            return fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => data.ip);
+            
+            document.getElementById('countdown').innerHTML = countdownHTML;
         }
 
-        // 載入上次的紀錄
-        getIp().then(ip => {
-            db.collection('grades').doc(ip).get().then(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    const selectedGrade = data.grade;
-                    gradeSelect.value = selectedGrade;
-                    toggleSubjects();
-                    for (let key in data) {
-                        if (key !== 'ip' && key !== 'grade') {
-                            const input = document.getElementById(key);
-                            const checkbox = document.getElementById(key + '_unpublished');
-                            if (input) {
-                                input.value = data[key] === '未公布' ? '' : data[key];
-                                input.disabled = data[key] === '未公布';
-                            }
-                            if (checkbox) {
-                                checkbox.checked = data[key] === '未公布';
-                            }
-                        }
-                    }
-                }
-            });
-        });
-
-        // 修復手機瀏覽器點擊按鈕後沒反應的問題
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('touchstart', function() {
-                this.classList.add('active');
-            });
-            button.addEventListener('touchend', function() {
-                this.classList.remove('active');
-            });
-        });
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        loadPlayerInfo();
     </script>
 </body>
 </html>
